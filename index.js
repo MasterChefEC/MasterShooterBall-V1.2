@@ -119,7 +119,7 @@ let projectiles = [];
 let enemies = [];
 let powerUps = [];
 let particles = [];
-let Difficulty = 800;
+let Difficulty = 2000;
 let interval = null;
 let intervalVelocity = null;
 let intervalPowerUp = null;
@@ -135,7 +135,7 @@ function init() {
   enemies = [];
   powerUps = [];
   particles = [];
-  Difficulty = 800;
+  Difficulty = 2000;
   interval = null;
   intervalVelocity = null;
   intervalPowerUp = null;
@@ -161,6 +161,7 @@ function spawnEnemies() {
       x: Math.cos(angle),
       y: Math.sin(angle),
     };
+
     intervalVelocity = setInterval(() => {
       velocity.x *= 2;
       velocity.y *= 2;
@@ -168,6 +169,22 @@ function spawnEnemies() {
     enemies.push(new Enemy(x, y, radius, color, velocity));
   }
   interval = setInterval(SpawnEnemy, Difficulty);
+
+  setTimeout(() => {
+    clearInterval(interval);
+    Difficulty = 1500;
+    interval = setInterval(SpawnEnemy, Difficulty);
+  }, 12000);
+  setTimeout(() => {
+    clearInterval(interval);
+    Difficulty = 1000;
+    interval = setInterval(SpawnEnemy, Difficulty);
+  }, 17000);
+  setTimeout(() => {
+    clearInterval(interval);
+    Difficulty = 800;
+    interval = setInterval(SpawnEnemy, Difficulty);
+  }, 21000);
 }
 //Generar PowerUps
 function SpawnPowerUps() {
@@ -191,7 +208,12 @@ function SpawnPowerUps() {
     };
     powerUps.push(new PowerUp(x, y, radius, color, velocity));
   }
-  intervalPowerUp = setInterval(SpawnPowerUp, 5000);
+  setTimeout(() => {
+    SpawnPowerUp();
+  }, 8000);
+  setTimeout(() => {
+    intervalPowerUp = setInterval(SpawnPowerUp, 21000);
+  }, 8000);
 }
 
 let animationId;
@@ -288,9 +310,20 @@ function animate() {
     const dist = Math.hypot(player.x - powerUp.x, player.y - powerUp.y);
     if (dist - powerUp.radius - player.radius < 1) {
       console.log("Llegué al jugador");
-      projectiles.forEach((projectile) => {
-        projectile.velocity.x *= 2;
-        projectile.velocity.y *= 2;
+      enemies.forEach((enemy) => {
+        for (let i = 0; i < enemy.radius * 2; i++) {
+          particles.push(
+            new Particle(enemy.x, enemy.y, Math.random() * 2, enemy.color, {
+              x: (Math.random() - 0.5) * (Math.random() * 8),
+              y: (Math.random() - 0.5) * (Math.random() * 8),
+            })
+          );
+        }
+        setTimeout(() => {
+          enemies.splice(index, 1);
+        }, 0);
+        score += 100;
+        scoreElement.innerHTML = score;
       });
       setTimeout(() => {
         powerUps.splice(index, 1);
